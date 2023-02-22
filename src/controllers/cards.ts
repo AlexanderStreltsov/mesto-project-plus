@@ -10,7 +10,6 @@ import {
 } from '../constants/status-codes';
 import {
   SERVER_ERROR_MSG,
-  CARD_INCORRECT_CREATE_MSG,
   CARD_INCORRECT_ID_MSG,
   CARD_NOT_FOUND_MSG,
   CARD_INCORRECT_ID_LIKE_MSG,
@@ -31,7 +30,7 @@ const createCard = (req: ICustomRequest, res: Response) => {
     .then((card) => res.status(CREATED).send({ data: card }))
     .catch((err) => {
       return err.name === 'ValidationError'
-        ? res.status(BAD_REQUEST).send({ message: CARD_INCORRECT_CREATE_MSG })
+        ? res.status(BAD_REQUEST).send({ message: err.message })
         : res.status(INTERNAL_SERVER_ERROR).send({ message: SERVER_ERROR_MSG });
     });
 };
