@@ -11,9 +11,6 @@ import {
   SERVER_ERROR_MSG,
   USER_NOT_FOUND_MSG,
   USER_INCORRECT_ID_MSG,
-  USER_INCORRECT_CREATE_MSG,
-  USER_INCORRECT_UPDATE_MSG,
-  USER_AVATAR_INCORRECT_UPDATE_MSG,
 } from '../constants/error-messages';
 
 const getUsers = (req: Request, res: Response) =>
@@ -56,7 +53,7 @@ const createUser = (req: Request, res: Response) => {
     .then((user) => res.status(CREATED).send({ data: user }))
     .catch((err) => {
       return err.name === 'ValidationError'
-        ? res.status(BAD_REQUEST).send({ message: USER_INCORRECT_CREATE_MSG })
+        ? res.status(BAD_REQUEST).send({ message: err.message })
         : res.status(INTERNAL_SERVER_ERROR).send({ message: SERVER_ERROR_MSG });
     });
 };
@@ -76,13 +73,12 @@ const updateUser = (req: ICustomRequest, res: Response) => {
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
+      const { message } = err;
       switch (err.name) {
         case 'ValidationError':
-          return res
-            .status(BAD_REQUEST)
-            .send({ message: USER_INCORRECT_UPDATE_MSG });
+          return res.status(BAD_REQUEST).send({ message });
         case 'FoundError':
-          return res.status(NOT_FOUND).send({ message: err.message });
+          return res.status(NOT_FOUND).send({ message });
         default:
           return res
             .status(INTERNAL_SERVER_ERROR)
@@ -106,13 +102,12 @@ const updateAvatar = (req: ICustomRequest, res: Response) => {
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      switch (err.name) {
+      const { name, message } = err;
+      switch (name) {
         case 'ValidationError':
-          return res
-            .status(BAD_REQUEST)
-            .send({ message: USER_AVATAR_INCORRECT_UPDATE_MSG });
+          return res.status(BAD_REQUEST).send({ message });
         case 'FoundError':
-          return res.status(NOT_FOUND).send({ message: err.message });
+          return res.status(NOT_FOUND).send({ message });
         default:
           return res
             .status(INTERNAL_SERVER_ERROR)
