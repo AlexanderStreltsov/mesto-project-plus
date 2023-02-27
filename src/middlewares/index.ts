@@ -1,3 +1,26 @@
-import addUserIdToReqTemp from './add-user-id-to-req-temp';
+import errorHandler from './error-handler';
+import auth from './auth';
+import { requestLogger, errorLogger } from './logger';
+import {
+  validateCreateUserBody,
+  validateLoginBody,
+  validateGetUserByIdParams,
+  validateUpdateUserBody,
+  validateUpdateUserAvatarBody,
+  validateCreateCardBody,
+  validateCardIdParams,
+} from './validators';
 
-export default addUserIdToReqTemp;
+export {
+  errorHandler,
+  auth,
+  requestLogger,
+  errorLogger,
+  validateCreateUserBody,
+  validateLoginBody,
+  validateGetUserByIdParams,
+  validateUpdateUserBody,
+  validateUpdateUserAvatarBody,
+  validateCreateCardBody,
+  validateCardIdParams,
+};

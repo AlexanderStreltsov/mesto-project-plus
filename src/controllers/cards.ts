@@ -1,67 +1,65 @@
-import { type Request, type Response } from 'express';
-import { type ObjectId } from 'mongoose';
+import { type Request, type Response, type NextFunction } from 'express';
 import { type ICustomRequest } from '../types';
 import { Card } from '../models';
+import { getCustomValidationMsg } from '../utils';
+import { BadRequestError, NotFoundError, ForbiddenError } from '../errors';
+import { CREATED } from '../constants/status-codes';
 import {
-  CREATED,
-  BAD_REQUEST,
-  NOT_FOUND,
-  INTERNAL_SERVER_ERROR,
-} from '../constants/status-codes';
-import {
-  SERVER_ERROR_MSG,
   CARD_INCORRECT_ID_MSG,
   CARD_NOT_FOUND_MSG,
   CARD_INCORRECT_ID_LIKE_MSG,
   CARD_INCORRECT_ID_DISLIKE_MSG,
+  CARD_DELETE_FORBIDDEN_MSG,
 } from '../constants/error-messages';
 
-const getCards = (req: Request, res: Response) =>
+const getCards = (req: Request, res: Response, next: NextFunction) =>
   Card.find({})
     .then((cards) => res.send({ data: cards }))
-    .catch(() =>
-      res.status(INTERNAL_SERVER_ERROR).send({ message: SERVER_ERROR_MSG }),
-    );
+    .catch(next);
 
-const createCard = (req: ICustomRequest, res: Response) => {
+const createCard = (req: ICustomRequest, res: Response, next: NextFunction) => {
   const { name, link } = req.body;
 
   return Card.create({ name, link, owner: req?.user?._id })
     .then((card) => res.status(CREATED).send({ data: card }))
     .catch((err) => {
-      return err.name === 'ValidationError'
-        ? res.status(BAD_REQUEST).send({ message: err.message })
-        : res.status(INTERNAL_SERVER_ERROR).send({ message: SERVER_ERROR_MSG });
-    });
-};
-
-const deleteCardById = (req: Request, res: Response) => {
-  const { cardId } = req.params;
-
-  return Card.findByIdAndRemove(cardId)
-    .orFail(() => {
-      const error = new Error(CARD_NOT_FOUND_MSG);
-      error.name = 'FoundError';
-      throw error;
-    })
-    .then((card) => res.send({ data: card }))
-    .catch((err) => {
-      switch (err.name) {
-        case 'CastError':
-          return res
-            .status(BAD_REQUEST)
-            .send({ message: CARD_INCORRECT_ID_MSG });
-        case 'FoundError':
-          return res.status(NOT_FOUND).send({ message: err.message });
-        default:
-          return res
-            .status(INTERNAL_SERVER_ERROR)
-            .send({ message: SERVER_ERROR_MSG });
+      if (err.name === 'ValidationError') {
+        next(new BadRequestError(getCustomValidationMsg(err)));
+      } else {
+        next(err);
       }
     });
 };
 
-const likeCard = (req: ICustomRequest, res: Response) => {
+const deleteCardById = (
+  req: ICustomRequest,
+  res: Response,
+  next: NextFunction,
+) => {
+  const { cardId } = req.params;
+
+  return Card.findById(cardId)
+    .orFail(() => {
+      throw new NotFoundError(CARD_NOT_FOUND_MSG);
+    })
+    .then((card) => {
+      if (card.owner.toString() === req?.user?._id.toString()) {
+        card.delete();
+        res.send({ data: card });
+      } else {
+        next(new ForbiddenError(CARD_DELETE_FORBIDDEN_MSG));
+      }
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequestError(CARD_INCORRECT_ID_MSG));
+      } else {
+        next(err);
+      }
+    });
+};
+
+const likeCard = (req: ICustomRequest, res: Response, next: NextFunction) => {
   const { cardId } = req.params;
 
   return Card.findByIdAndUpdate(
@@ -70,53 +68,39 @@ const likeCard = (req: ICustomRequest, res: Response) => {
     { new: true },
   )
     .orFail(() => {
-      const error = new Error(CARD_NOT_FOUND_MSG);
-      error.name = 'FoundError';
-      throw error;
+      throw new NotFoundError(CARD_NOT_FOUND_MSG);
     })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
-      switch (err.name) {
-        case 'CastError':
-          return res
-            .status(BAD_REQUEST)
-            .send({ message: CARD_INCORRECT_ID_LIKE_MSG });
-        case 'FoundError':
-          return res.status(NOT_FOUND).send({ message: err.message });
-        default:
-          return res
-            .status(INTERNAL_SERVER_ERROR)
-            .send({ message: SERVER_ERROR_MSG });
+      if (err.name === 'CastError') {
+        next(new BadRequestError(CARD_INCORRECT_ID_LIKE_MSG));
+      } else {
+        next(err);
       }
     });
 };
 
-const dislikeCard = (req: ICustomRequest, res: Response) => {
+const dislikeCard = (
+  req: ICustomRequest,
+  res: Response,
+  next: NextFunction,
+) => {
   const { cardId } = req.params;
 
   Card.findByIdAndUpdate(
     cardId,
-    { $pull: { likes: req?.user?._id as unknown as ObjectId } },
+    { $pull: { likes: req?.user?._id } },
     { new: true },
   )
     .orFail(() => {
-      const error = new Error(CARD_NOT_FOUND_MSG);
-      error.name = 'FoundError';
-      throw error;
+      throw new NotFoundError(CARD_NOT_FOUND_MSG);
     })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
-      switch (err.name) {
-        case 'CastError':
-          return res
-            .status(BAD_REQUEST)
-            .send({ message: CARD_INCORRECT_ID_DISLIKE_MSG });
-        case 'FoundError':
-          return res.status(NOT_FOUND).send({ message: err.message });
-        default:
-          return res
-            .status(INTERNAL_SERVER_ERROR)
-            .send({ message: SERVER_ERROR_MSG });
+      if (err.name === 'CastError') {
+        next(new BadRequestError(CARD_INCORRECT_ID_DISLIKE_MSG));
+      } else {
+        next(err);
       }
     });
 };
