@@ -13,15 +13,21 @@ export const USER_ABOUT_MIN_MSG = 'Минимальная длина поля `a
 export const USER_ABOUT_MAX_MSG =
   'Максимальная длина поля `about` 200 символов';
 
-export const USER_AVATAR_URL_MSG =
-  'Некорректная ссылка `{VALUE}` (поле `avatar`)';
+export const USER_AVATAR_URL_MSG = 'Некорректная ссылка в поле `avatar`';
+export const USER_AVATAR_EMPTY_MSG = 'Поле `avatar` не может быть пустым';
 
 export const USER_EMAIL_REQUIRED_MSG =
   'Поле `email` обязательно для заполнения';
-export const USER_EMAIL_VALID_MSG = 'Некорректный email `{VALUE}`';
+export const USER_EMAIL_VALID_MSG = 'Некорректный email';
 
 export const USER_PASSWORD_REQUIRED_MSG =
   'Поле `password` обязательно для заполнения';
+
+export const USER_ID_REQUIRED_MSG = 'Параметр `userId` обязателен';
+export const USER_ID_LENGTH_MSG =
+  'Параметр `userId` должен быть равен 24 символам';
+export const USER_ID_HEX_MSG =
+  'Параметр `userId` должен быть допустимой шестнадцатеричной строкой';
 
 export const CARD_NOT_FOUND_MSG = 'Карточка не найдена';
 export const CARD_INCORRECT_ID_MSG = 'Некорректный _id для поиска карточки';
@@ -36,7 +42,13 @@ export const CARD_NAME_MIN_MSG = 'Минимальная длина поля `na
 export const CARD_NAME_MAX_MSG = 'Максимальная длина поля `name` 30 символов';
 
 export const CARD_LINK_REQUIRED_MSG = 'Поле `link` обязательно для заполнения';
-export const CARD_LINK_URL_MSG = 'Некорректная ссылка `{VALUE}` (поле `link`)';
+export const CARD_LINK_URL_MSG = 'Некорректная ссылка в поле `link`';
 
 export const CARD_OWNER_REQUIRED_MSG =
   'Поле `owner` обязательно для заполнения';
+
+export const CARD_ID_REQUIRED_MSG = 'Параметр `cardId` обязателен';
+export const CARD_ID_LENGTH_MSG =
+  'Параметр `cardId` должен быть равен 24 символам';
+export const CARD_ID_HEX_MSG =
+  'Параметр `cardId` должен быть допустимой шестнадцатеричной строкой';

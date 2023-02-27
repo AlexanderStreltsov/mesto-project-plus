@@ -12,7 +12,6 @@ import {
   USER_NOT_FOUND_MSG,
   USER_INCORRECT_ID_MSG,
   USER_DUPLICATE_MSG,
-  USER_PASSWORD_REQUIRED_MSG,
 } from '../constants/error-messages';
 
 const getUsers = (req: Request, res: Response, next: NextFunction) =>
@@ -53,10 +52,6 @@ const getUserById = (req: Request, res: Response, next: NextFunction) => {
 
 const createUser = (req: Request, res: Response, next: NextFunction) => {
   const { name, about, avatar, email, password } = req.body;
-
-  if (!password) {
-    return next(new BadRequestError(USER_PASSWORD_REQUIRED_MSG));
-  }
 
   return bcrypt
     .hash(password, HASH_SALT_ROUNDS)
