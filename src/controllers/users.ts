@@ -1,6 +1,7 @@
 import { type Request, type Response } from 'express';
 import { User } from '../models';
 import { type ICustomRequest } from '../types';
+import getCustomValidationMsg from '../utils/get-custom-validation-msg';
 import {
   CREATED,
   BAD_REQUEST,
@@ -53,7 +54,7 @@ const createUser = (req: Request, res: Response) => {
     .then((user) => res.status(CREATED).send({ data: user }))
     .catch((err) => {
       return err.name === 'ValidationError'
-        ? res.status(BAD_REQUEST).send({ message: err.message })
+        ? res.status(BAD_REQUEST).send({ message: getCustomValidationMsg(err) })
         : res.status(INTERNAL_SERVER_ERROR).send({ message: SERVER_ERROR_MSG });
     });
 };
@@ -73,12 +74,13 @@ const updateUser = (req: ICustomRequest, res: Response) => {
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      const { message } = err;
       switch (err.name) {
         case 'ValidationError':
-          return res.status(BAD_REQUEST).send({ message });
+          return res
+            .status(BAD_REQUEST)
+            .send({ message: getCustomValidationMsg(err) });
         case 'FoundError':
-          return res.status(NOT_FOUND).send({ message });
+          return res.status(NOT_FOUND).send({ message: err.message });
         default:
           return res
             .status(INTERNAL_SERVER_ERROR)
@@ -102,12 +104,13 @@ const updateAvatar = (req: ICustomRequest, res: Response) => {
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      const { name, message } = err;
-      switch (name) {
+      switch (err.name) {
         case 'ValidationError':
-          return res.status(BAD_REQUEST).send({ message });
+          return res
+            .status(BAD_REQUEST)
+            .send({ message: getCustomValidationMsg(err) });
         case 'FoundError':
-          return res.status(NOT_FOUND).send({ message });
+          return res.status(NOT_FOUND).send({ message: err.msg });
         default:
           return res
             .status(INTERNAL_SERVER_ERROR)

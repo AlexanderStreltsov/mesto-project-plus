@@ -2,6 +2,7 @@ import { type Request, type Response } from 'express';
 import { type ObjectId } from 'mongoose';
 import { type ICustomRequest } from '../types';
 import { Card } from '../models';
+import getCustomValidationMsg from '../utils/get-custom-validation-msg';
 import {
   CREATED,
   BAD_REQUEST,
@@ -30,7 +31,7 @@ const createCard = (req: ICustomRequest, res: Response) => {
     .then((card) => res.status(CREATED).send({ data: card }))
     .catch((err) => {
       return err.name === 'ValidationError'
-        ? res.status(BAD_REQUEST).send({ message: err.message })
+        ? res.status(BAD_REQUEST).send({ message: getCustomValidationMsg(err) })
         : res.status(INTERNAL_SERVER_ERROR).send({ message: SERVER_ERROR_MSG });
     });
 };

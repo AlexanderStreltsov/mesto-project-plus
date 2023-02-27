@@ -9,11 +9,28 @@ export const CARD_INCORRECT_ID_LIKE_MSG = 'Некорректный _id карт
 export const CARD_INCORRECT_ID_DISLIKE_MSG =
   'Некорректный _id карточки (удаление лайка)';
 
-export const REQUIRED_MSG = 'обязательный параметр';
-export const MIN_2_MSG =
-  'минимальная длина 2 символа, полученное значение `{VALUE}`';
-export const MAX_30_MSG =
-  'максимальная длина 30 символов, полученное значение `{VALUE}`';
-export const MAX_200_MSG =
-  'максимальная длина 200 символов, полученное значение `{VALUE}`';
-export const VALIDATE_URL_MSG = '`{VALUE}` не является ссылкой';
+export const USER_NAME_REQUIRED_MSG = 'Поле `name` обязательно для заполнения';
+export const USER_NAME_MIN_MSG = 'Минимальная длина поля `name` 2 символа';
+export const USER_NAME_MAX_MSG = 'Максимальная длина поля `name` 30 символов';
+
+export const USER_ABOUT_REQUIRED_MSG =
+  'Поле `about` обязательно для заполнения';
+export const USER_ABOUT_MIN_MSG = 'Минимальная длина поля `about` 2 символа';
+export const USER_ABOUT_MAX_MSG =
+  'Максимальная длина поля `about` 200 символов';
+
+export const USER_AVATAR_REQUIRED_MSG =
+  'Поле `avatar` обязательно для заполнения';
+export const USER_AVATAR_URL_MSG =
+  'Значение `{VALUE}` поля `avatar` не является ссылкой';
+
+export const CARD_NAME_REQUIRED_MSG = 'Поле `name` обязательно для заполнения';
+export const CARD_NAME_MIN_MSG = 'Минимальная длина поля `name` 2 символа';
+export const CARD_NAME_MAX_MSG = 'Максимальная длина поля `name` 30 символов';
+
+export const CARD_LINK_REQUIRED_MSG = 'Поле `link` обязательно для заполнения';
+export const CARD_LINK_URL_MSG =
+  'Значение `{VALUE}` поля `link` не является ссылкой';
+
+export const CARD_OWNER_REQUIRED_MSG =
+  'Поле `owner` обязательно для заполнения';
