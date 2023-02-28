@@ -1,4 +1,5 @@
 import { type Request, type Response, type NextFunction } from 'express';
+import { Error } from 'mongoose';
 import { type ICustomRequest } from '../types';
 import { Card } from '../models';
 import { getCustomValidationMsg } from '../utils';
@@ -31,32 +32,33 @@ const createCard = (req: ICustomRequest, res: Response, next: NextFunction) => {
     });
 };
 
-const deleteCardById = (
+const deleteCardById = async (
   req: ICustomRequest,
   res: Response,
   next: NextFunction,
 ) => {
   const { cardId } = req.params;
 
-  return Card.findById(cardId)
-    .orFail(() => {
-      throw new NotFoundError(CARD_NOT_FOUND_MSG);
-    })
-    .then((card) => {
-      if (card.owner.toString() === req?.user?._id.toString()) {
-        card.delete();
-        res.send({ data: card });
-      } else {
-        next(new ForbiddenError(CARD_DELETE_FORBIDDEN_MSG));
-      }
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new BadRequestError(CARD_INCORRECT_ID_MSG));
-      } else {
-        next(err);
-      }
-    });
+  try {
+    const card = await Card.findById(cardId);
+
+    if (!card) {
+      return next(new NotFoundError(CARD_NOT_FOUND_MSG));
+    }
+
+    if (card.owner.toString() === req?.user?._id.toString()) {
+      await card.delete();
+      return res.send({ data: card });
+    }
+
+    return next(new ForbiddenError(CARD_DELETE_FORBIDDEN_MSG));
+  } catch (err) {
+    if (err instanceof Error.CastError) {
+      return next(new BadRequestError(CARD_INCORRECT_ID_MSG));
+    }
+
+    return next(err);
+  }
 };
 
 const likeCard = (req: ICustomRequest, res: Response, next: NextFunction) => {

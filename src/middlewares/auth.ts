@@ -9,13 +9,11 @@ import { USER_NOT_AUTH_MSG } from '../constants/error-messages';
 const { JWT_SALT = JWT_SALT_DEV } = process.env;
 
 const auth = (req: ICustomRequest, res: Response, next: NextFunction) => {
-  const { authorization } = req.headers;
+  const { token } = req.cookies;
 
-  if (!authorization || !authorization.startsWith('Bearer ')) {
+  if (!token) {
     throw new UnauthorizedError(USER_NOT_AUTH_MSG);
   }
-
-  const token = authorization.replace('Bearer ', '');
 
   let payload;
   try {
